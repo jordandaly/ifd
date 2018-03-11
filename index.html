@@ -287,8 +287,9 @@
     </div>
     
     <script type="text/javascript">
-      $(".myselect").select2();
+      $("#myselect").select2();
       var e = document.getElementById("myselect");
+      console.log(e);
       var country = e.options[e.selectedIndex].value;
       console.log("default selected item on page load:" + country);
       
