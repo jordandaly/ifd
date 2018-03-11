@@ -120,20 +120,17 @@ function writeToDocument(type) {
 }
 */
 
-function writeToDocument(type,country) {
-    var el = document.getElementById("data");
-    el.innerHTML = "";
-    var runnningTotal = 0;
-    var overallAverage = 0;
-    var responseCount = 0;
+function makeGraph(type,country) {
+    
+    
     var dataArrayPr = [
         {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
-        {"date": "1920-1939", "precipitation": ""},
+        {"date": "1940-1959", "precipitation": ""},
+        {"date": "1960-1979", "precipitation": ""},
+        {"date": "1980-1999", "precipitation": ""},
+        {"date": "2020-2039", "precipitation": ""},
+        {"date": "2040-2059", "precipitation": ""},
+        {"date": "2060-2079", "precipitation": ""},
         {"date": "2080-2099", "precipitation": ""}
 ];
 
@@ -151,6 +148,9 @@ function writeToDocument(type,country) {
 
 
     getData19201939(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -158,16 +158,21 @@ function writeToDocument(type,country) {
         });
         
        overallAverage = (runnningTotal / responseCount);
+       console.log("19201939 responseCount:" + responseCount);
        console.log(type);
        if (type == 'pr') {
        dataArrayPr[0].precipitation = overallAverage;
        } else if (type == 'tas') {
        dataArrayTas[0].temperature = overallAverage;    
        }
+       
         
         });
         
     getData19401959(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -180,10 +185,14 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[1].temperature = overallAverage;    
        }
+       
         
         });
         
     getData19601979(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -196,10 +205,14 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[2].temperature = overallAverage;    
        }
+       
         
         });
         
     getData19801999(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -212,10 +225,14 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[3].temperature = overallAverage;    
        }
+       
         
         });
         
     getData20202039(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -223,15 +240,20 @@ function writeToDocument(type,country) {
         });
         
        overallAverage = (runnningTotal / responseCount);
+       console.log("20202039 responseCount:" + responseCount);
        if (type == 'pr') {
        dataArrayPr[4].precipitation = overallAverage;
        } else if (type == 'tas') {
        dataArrayTas[4].temperature = overallAverage;    
        }
+       
         
         });
         
     getData20402059(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -244,10 +266,14 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[5].temperature = overallAverage;    
        }
+       
         
         });
         
     getData20602079(type, country, function(data) {
+        var responseCount = 0;
+        var runnningTotal = 0;
+        var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -260,11 +286,15 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[6].temperature = overallAverage;    
        }
+       
         
         });
         
         
     getData20802099(type, country, function(data) {
+         var responseCount = 0;
+         var runnningTotal = 0;
+         var overallAverage = 0;
 
         data.forEach(function(item) {
           runnningTotal  += Number(item.annualData);
@@ -277,21 +307,78 @@ function writeToDocument(type,country) {
        } else if (type == 'tas') {
        dataArrayTas[7].temperature = overallAverage;    
        }
+       
         
         });
         
         if (type == 'pr') {
        console.log(dataArrayPr);  
-    el.innerHTML = "<p>" + dataArrayPr + "</p>"; 
-    document.getElementById("data").innerHTML = dataArrayPr;
-       } else if (type == 'tas') {
-       console.log(dataArrayTas);  
-    el.innerHTML = "<p>" + dataArrayTas + "</p>"; 
-    document.getElementById("data").innerHTML = dataArrayTas;    
-       }
+    
+    
+    setTimeout(function() {
+    var ndx = crossfilter(dataArrayPr); 
+    
+    var date_dim = ndx.dimension(dc.pluck('date'));
+    var value_dim = date_dim.group().reduceSum(dc.pluck('precipitation'));
+    
+    var chart = dc.barChart("#chart-precipitation-here");
+        chart
+            .width(500)
+            .height(300)
+            .margins({top: 10, right: 50, bottom: 30, left: 50})
+            .dimension(date_dim)
+            .group(value_dim)
+            .transitionDuration(500)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Date")
+            .y(d3.scale.linear().domain(d3.extent(dataArrayPr, function(d) { return d.precipitation; })))
+            .yAxisLabel("Precipitation (Millimetres)")
+            .yAxis().ticks(4);
         
+        dc.renderAll()
+}, 1500);
+    
+    
+    
+    
+       } 
+       
+       else if (type == 'tas') {
+       console.log(dataArrayTas);  
+     
+    
+    setTimeout(function() {
+    var ndx = crossfilter(dataArrayTas); 
+    
+    var date_dim = ndx.dimension(dc.pluck('date'));
+    var value_dim = date_dim.group().reduceSum(dc.pluck('temperature'));
+    
+    
+    var chart = dc.barChart("#chart-temperature-here");
+        chart
+            .width(500)
+            .height(300)
+            .margins({top: 10, right: 50, bottom: 30, left: 50})
+            .dimension(date_dim)
+            .group(value_dim)
+            .transitionDuration(500)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Date")
+            .y(d3.scale.linear().domain(d3.extent(dataArrayTas, function(d) { return d.temperature; })))
+            .yAxisLabel("Temperature (Degrees Celcius)")
+            .yAxis().ticks(4);
+        
+        dc.renderAll()
+}, 1500);
+    
+    
+       }
       
-    
-    
+      
+      
 }
+
+
 
